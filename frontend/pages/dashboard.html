@@ -1,0 +1,22 @@
+<section class="dashboard-page">
+  <nav class="navbar">
+    <span id="welcome-user"></span>
+    <button onclick="logout()">Logout</button>
+  </nav>
+
+  <div class="dashboard-container">
+    <h2>Upload Bank Statement</h2>
+    <input type="file" id="bank-statement" accept=".csv" />
+    <button onclick="uploadStatement()">Analyze</button>
+
+    <div id="budget-form">
+      <input type="number" id="budget" placeholder="Set your monthly budget" />
+      <button onclick="setBudget()">Save Budget</button>
+    </div>
+
+    <div id="analysis-results">
+      <h3>Financial Analysis</h3>
+      <ul id="summary-list"></ul>
+    </div>
+  </div>
+</section>
