@@ -21,7 +21,7 @@ run:
 .PHONY: push
 push:
 	git add .
-	git commit -m "Update Dockerfile and Makefile"
+	git commit -m "Update application"
 	git push origin main
 .PHONY: deploy
 deploy:
