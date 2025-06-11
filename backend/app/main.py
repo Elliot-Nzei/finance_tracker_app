@@ -1,20 +1,30 @@
-# Entry point for FastAPI app
-from fastapi import FastAPI, UploadFile, File, Form
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from backend.app.api import auth, budget
 
-app = FastAPI()
+from app.api import user, finance
+
+app = FastAPI(title="Finance Tracker App Backend")
+
+# Allow CORS for frontend (adjust origins as needed)
+origins = [
+    "http://localhost",
+    "http://localhost:8000",
+    "http://localhost:3000",
+    "*",
+]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-app.mount("/static", StaticFiles(directory="backend/app/static"), name="static")
+# Include routers
+app.include_router(user.router, prefix="/api/user", tags=["user"])
+app.include_router(finance.router, prefix="/api/finance", tags=["finance"])
 
-app.include_router(auth.router, prefix="/api/auth")
-app.include_router(budget.router, prefix="/api/budget")
+@app.get("/")
+async def root():
+    return {"message": "Finance Tracker API is running"}
