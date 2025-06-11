@@ -1,18 +1,28 @@
 from fastapi import APIRouter, UploadFile, File, Form
-import pandas as pd
+from fastapi.responses import JSONResponse
+
+from app.services.finance_service import analyze_statement, save_budget, load_budget
 
 router = APIRouter()
 
-@router.post("/upload")
-def upload(user_id: str = Form(...), budget: float = Form(...), bank_statement: UploadFile = File(...)):
-    df = pd.read_csv(bank_statement.file)
-    total_spent = df["Amount"].sum()
-    most_spent = df.sort_values(by="Amount", ascending=False).iloc[0]
-    recurring = df["Description"].value_counts().idxmax()
-    savings = budget - total_spent
-    return {
-        "total_spent": total_spent,
-        "most_spent": most_spent.to_dict(),
-        "most_recurring": recurring,
-        "estimated_savings": savings
-    }
+
+@router.post("/analyze")
+async def analyze(file: UploadFile = File(...)):
+    if not file.filename.endswith(".csv"):
+        return JSONResponse(status_code=400, content={"error": "Only CSV files are supported."})
+    
+    content = await file.read()
+    analysis = analyze_statement(content.decode("utf-8"))
+    return JSONResponse(content={"summary": analysis})
+
+
+@router.post("/budget")
+async def set_budget(amount: float = Form(...)):
+    save_budget(amount)
+    return JSONResponse(content={"message": "Budget saved."})
+
+
+@router.get("/budget")
+async def get_budget():
+    budget = load_budget()
+    return JSONResponse(content={"budget": budget})
